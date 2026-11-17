@@ -94,3 +94,36 @@ def parts_all(Xraw, chunk=10000):
                  h42b12=hog2(dk,4,2,12), snpix=sn.reshape(len(sn),-1), sn42=hog2(sn,4,2))
         for k,v in q.items(): P.setdefault(k, []).append(v.astype(np.float32))
     return {k: np.vstack(v) for k,v in P.items()}
+
+# --- 질감 특성 (실험 F) ---
+def lbp_feat(imgs, cell=7):
+    # 각 픽셀이 이웃 8개 중 몇 개보다 밝은지(0~8)를 7x7 칸마다 히스토그램 → 16칸 x 9 = 144
+    p = np.pad(imgs, ((0, 0), (1, 1), (1, 1)))
+    c = imgs
+    cnt = np.zeros_like(imgs, dtype=np.int8)
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            if dy == 0 and dx == 0: continue
+            cnt += (p[:, 1 + dy:29 + dy, 1 + dx:29 + dx] >= c).astype(np.int8)
+    cnt = np.where(c > 0.05, cnt, -1)          # 배경은 제외
+    n = len(imgs); g = 28 // cell
+    out = np.zeros((n, g, g, 9), np.float32)
+    for k in range(9):
+        out[..., k] = (cnt == k).reshape(n, g, cell, g, cell).sum(axis=(2, 4))
+    tot = out.sum(-1, keepdims=True) + 1e-6
+    return (out / tot).reshape(n, -1)
+
+def gabor_feat(imgs, cell=7):
+    # 4방향 x 2주파수 가보르 필터 반응 크기를 7x7 칸마다 평균 → 8 x 16 = 128
+    feats = []
+    yy, xx = np.mgrid[-4:5, -4:5].astype(np.float32)
+    for lam in (4.0, 7.0):
+        for th in (0, np.pi / 4, np.pi / 2, 3 * np.pi / 4):
+            xr = xx * np.cos(th) + yy * np.sin(th); yr = -xx * np.sin(th) + yy * np.cos(th)
+            k = np.exp(-(xr ** 2 + yr ** 2) / (2 * (lam / 2) ** 2)) * np.cos(2 * np.pi * xr / lam)
+            k -= k.mean()
+            r = np.abs(ndimage.convolve(imgs, k[None], mode="constant"))
+            n = len(imgs); g = 28 // cell
+            feats.append(r.reshape(n, g, cell, g, cell).mean(axis=(2, 4)).reshape(n, -1))
+    f = np.hstack(feats)
+    return f / (f.max(axis=1, keepdims=True) + 1e-6)

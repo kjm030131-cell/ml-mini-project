@@ -1,7 +1,7 @@
 # 병렬 실험 세션 공통 코드: 데이터 로드, 특성 캐시, SVC 평가
 # 기준: 학습 = 앞 5만 개, 채점(홀드아웃) = 220000~240000 (2만 개). 기준 SVC 오답 100개.
 import numpy as np, os, time, glob
-from feats import deskew, hog2, holes
+from feats import deskew, hog2, holes, lbp_feat, gabor_feat
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(ROOT, "..", "..", "data")
 CACHE = os.path.join(ROOT, "cache"); os.makedirs(CACHE, exist_ok=True)
@@ -29,6 +29,7 @@ def feat(part, key):
              "h42": lambda: hog2(im, 4, 2), "h84": lambda: hog2(im, 8, 4), "rh42": lambda: hog2(im, 4, 2),
              "h73": lambda: hog2(im, 7, 3), "h62": lambda: hog2(im, 6, 2),
              "holes": lambda: holes(im) / np.array([1, 50], np.float32),
+             "lbp": lambda: lbp_feat(im), "gab": lambda: gabor_feat(im),
              "rows": lambda: im.sum(2) / 28, "cols": lambda: im.sum(1) / 28}[key]()
         np.save(p, f.astype(np.float32))
     return np.load(p)
