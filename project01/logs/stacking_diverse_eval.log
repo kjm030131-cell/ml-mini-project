@@ -1,0 +1,18 @@
+RESULT svc_raw holdout 0.9937 wrong 127 2572s
+svc wrong 98
+lgbm wrong 122
+raw wrong 125
+sn wrong 123
+svc+lgbm wrong 89
+svc+raw wrong 101
+svc+sn wrong 105
+lgbm+raw wrong 102
+lgbm+sn wrong 106
+raw+sn wrong 122
+svc+lgbm+raw wrong 85
+svc+lgbm+sn wrong 97
+svc+raw+sn wrong 99
+lgbm+raw+sn wrong 104
+svc+lgbm+raw+sn wrong 91
+
+[exited with code 0]
