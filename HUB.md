@@ -24,6 +24,10 @@
 - C 추가 특성(`sC_features.py`) → `C_extra_features.md`, exp/C-extra-features
 - D Stacking 재현(`sD_stacking.py`) → `D_stacking.md`, exp/D-stacking
 
+## 자료
+- `docs/INDEX.md`: 미니 프로젝트 4개 문제와 강의 요약 노트 (강의 원본은 저장소에 없음)
+- 데이터: 1번은 `data/emnist_digits_train_part*.npz`, 2~4번은 재민에게 받아야 함
+
 ## 할 수 있는 일
 - 현황 확인: `gh api repos/kjm030131-cell/ml-mini-project/pulls?state=all` 과 각 브랜치의 results 파일 읽기 (GraphQL은 막혀 있어 REST만)
 - 정리: 기준선 100 대비 비교표, 효과 있는 조합 표시
