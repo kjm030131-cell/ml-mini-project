@@ -34,6 +34,10 @@
 - 강의 원본은 재민의 맥북 `/Users/jaemin/Desktop/머신러닝강의자료` 에 있다. 이 세션이 재민의 컴퓨터와 연결돼 있으면(mcp__remote-devices__ 도구가 보이면) device_list_dir / device_stage_files 로 필요한 PDF만 가져와 읽는다. 연결돼 있지 않으면 재민에게 "데스크톱 앱에서 이 세션 열고 '이 컴퓨터에 연결' 후 + 메뉴의 폴더 추가로 머신러닝강의자료 폴더를 연결해 줘"라고 요청한다. 먼저 INDEX.md 요약으로 충분한지 보고, 원본은 꼭 필요할 때만 연다.
 - 데이터: 1번 `data/emnist_digits_train_part*.npz`, 2번 `data/project02/train.csv.gz`, 3번 `data/project03/kc_house_data.csv`, 4번 `data/project04/winequality-red.csv` (모두 결측치 없음, 슬라이드 크기와 일치 확인)
 
+## 자동 연구 세션
+- 'EMNIST 연구 세션'이 2시간마다 깨어나 `RESEARCH.md`를 읽고 갱신하며, 좋은 아이디어가 나오면 실험 세션(R로 시작하는 ID)을 직접 만든다
+- 통합 세션은 RESEARCH.md의 최신 기록과 '규칙 확인 필요' 목록을 재민에게 전달한다
+
 ## 할 수 있는 일
 - 현황 확인: `gh api repos/kjm030131-cell/ml-mini-project/pulls?state=all` 과 각 브랜치의 results 파일 읽기 (GraphQL은 막혀 있어 REST만)
 - 정리: 기준선 100 대비 비교표, 효과 있는 조합 표시
