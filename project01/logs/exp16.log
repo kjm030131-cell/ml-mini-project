@@ -1,0 +1,11 @@
+RESULT svc15 단독 wrong 89 1691s
+RESULT stack svc15+lgbm C=1 wrong 86
+RESULT stack svc15+lgbm C=10 wrong 86
+RESULT stack svc15+raw C=1 wrong 93
+RESULT stack svc15+raw C=10 wrong 93
+RESULT stack svc15+lgbm+raw C=1 wrong 82
+RESULT stack svc15+lgbm+raw C=10 wrong 81
+RESULT stack svc15+svc+lgbm+raw C=1 wrong 80
+RESULT stack svc15+svc+lgbm+raw C=10 wrong 85
+RESULT stack svc15+lgbm+raw+lr C=1 wrong 78
+RESULT stack svc15+lgbm+raw+lr C=10 wrong 78

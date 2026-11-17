@@ -21,10 +21,12 @@ def profiles(p):
     return np.hstack([left,right,top,bottom]).astype(np.float32)
 def h73(p): return hog2(img(p),7,3)
 base=lambda p: np.hstack([L(p,"dkpix"), L(p,"h42"), L(p,"h84")*2, extra14(p)*1.5])
-mode=sys.argv[1]
-if mode=="prof": A=np.hstack([base("tr"),profiles("tr")]); B=np.hstack([base("te"),profiles("te")])
-else: A=np.hstack([base("tr"),h73("tr"),profiles("tr")]); B=np.hstack([base("te"),h73("te"),profiles("te")])
-A=A.astype(np.float64); B=B.astype(np.float64)
-t=time.time(); m=SVC(C=10, gamma=1.2/(A.shape[1]*A.var()), cache_size=500).fit(A,y); p=m.predict(B); w=(p!=yte).sum()
-print(f"RESULT {mode:5s} wrong {w}  {time.time()-t:.0f}s", flush=True)
-print(Counter(tuple(sorted((int(a),int(b)))) for a,b in zip(yte[p!=yte],p[p!=yte])).most_common(6), flush=True)
+if __name__=='__main__':
+    mode=sys.argv[1]
+    if mode=="prof": A=np.hstack([base("tr"),profiles("tr")]); B=np.hstack([base("te"),profiles("te")])
+    else: A=np.hstack([base("tr"),h73("tr"),profiles("tr")]); B=np.hstack([base("te"),h73("te"),profiles("te")])
+    A=A.astype(np.float64); B=B.astype(np.float64)
+    t=time.time(); m=SVC(C=10, gamma=1.2/(A.shape[1]*A.var()), cache_size=500).fit(A,y); p=m.predict(B); w=(p!=yte).sum()
+    print(f"RESULT {mode:5s} wrong {w}  {time.time()-t:.0f}s", flush=True)
+    print(Counter(tuple(sorted((int(a),int(b)))) for a,b in zip(yte[p!=yte],p[p!=yte])).most_common(6), flush=True)
+    
