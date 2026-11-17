@@ -33,6 +33,7 @@
 | Stacking SVC + LGBM + 원본SVC (수동) | 85 | 전체 실행 17~20시간 |
 | 실험 H: 기준 + 구멍 + HOG73, gamma 1.2배 | 89 | 단일 SVC, 판정 기준(90 이하) 통과 |
 | 메인 15차: 기준 + 14차 오답쌍 특성 x1.5 + 윤곽선(프로파일) 112, g1.2 (`exp15.py prof`) | 88 | **단일 SVC 최고** (약 0.9956) |
+| R3: 제출 노트북 Stacking, 내부 cv=KFold(2) (규칙 안전판) | 81 | 정수 cv(=Stratified) 80 과 동일, 2코어 87분 |
 | **메인 16차: Stacking svc15 + LGBM + 원본SVC + LR (최종 LR C=1~10, 내부 cv=3)** | **78** | **현재 최고** (약 0.9961, 기준 대비 −22). 전체 24만 10-fold 실행 시간 미확인 |
 
 ## 이미 해본 것 (반복 금지)
@@ -43,7 +44,7 @@
 - 진행 중: A 특성 비중, B C·gamma, C 추가 특성(구멍·투영·HOG 크기), D StackingClassifier 재현, StandardScaler(메인 세션)
 
 ## 아이디어 대기열 (우선순위 순, 연구 세션이 갱신)
-0-A. **[진행: R3, 연구 세션 5회차가 직접 실행]** 제출 노트북 Stacking 내부 cv 를 KFold(2) 로 바꿔도 오답 80 근처인지 (`R3_stack_kfold.py kfold2`). 다음은 kfold2s(shuffle) 비교
+0-A. **[완료 R3, PR #11] 제출 노트북 Stacking 내부 cv=KFold(2) → 오답 81 (정수 cv 80 과 동일).** KFold 로 바꿔도 손해 없음. 다음 후보: 3↔5 전용 특성(R3 에서도 5→3 10개로 1위)
 0. **[R1·R2 세션은 생성 실패로 미실행 — 스크립트만 있음]** **[최우선] 16차 Stacking(오답 78)을 24만 개 10-fold로 돌릴 수 있게 시간 줄이기**: StackingClassifier(cv=2~3, n_jobs) 구성과 예상 시간 측정, 맥(M4 16GB) 기준 하룻밤 안(10시간 이하)에 끝나는 설정 찾기
 0-0. 이전: **단일 SVC는 오답 88 근처에서 정체 (전체 약 0.9968). 0.997 이상은 Stacking이 필요** — 실험 I 결과를 보고, 15차 SVC 특성(`exp15.py prof` 조합)을 Stacking 재료로 쓰는 실험을 설계할 것
 0-1. **3↔5 구분 특성** (가장 많이 틀리는 쌍 14개, 지금까지 어떤 특성으로도 안 줄어듦). 후보: 왼쪽 위 사분면의 획 방향, 위쪽 가로획 길이, 중간 높이에서 왼쪽 획 유무
@@ -60,7 +61,7 @@
 9. Stacking 시간 단축안: 내부 cv=3, LGBM 트리 수 축소, 최종 판정 LogisticRegression C 조정
 10. **W03 46쪽 특성 조합**: 보정 전·후 HOG 차이, 위·아래 절반 잉크 비율 같은 비율 특성
 ## 규칙 확인 필요 (재민에게 물을 것)
-- **[긴급] 제출 노트북 `mini_proj_01_20221329_stack.ipynb` 셀 7 `cross_val_score(stack_clf, ..., cv=10)` 과 셀 5 `StackingClassifier(cv=2)`, 셀 6 `cv=3` 이 모두 정수 cv → 자동 StratifiedKFold.** 제출 전에 `from sklearn.model_selection import KFold` 후 `cv=KFold(n_splits=10)` (바깥), `cv=KFold(n_splits=2)` (Stacking 내부)로 바꿀 것. 내부 변경의 성능 영향은 R3 로 측정 중 (2026-11-18 4시 기록)
+- **[긴급] 제출 노트북 `mini_proj_01_20221329_stack.ipynb` 셀 7 `cross_val_score(stack_clf, ..., cv=10)` 과 셀 5 `StackingClassifier(cv=2)`, 셀 6 `cv=3` 이 모두 정수 cv → 자동 StratifiedKFold.** 제출 전에 `from sklearn.model_selection import KFold` 후 `cv=KFold(n_splits=10)` (바깥), `cv=KFold(n_splits=2)` (Stacking 내부)로 바꿀 것. 내부 변경의 성능 영향은 R3(PR #11)에서 오답 81 vs 80 으로 차이 없음 확인
 - **[중요] `cross_val_predict(..., cv=3)` 와 `StackingClassifier(cv=3)` 처럼 cv 에 정수를 주면 사이킷런은 분류기에서 자동으로 StratifiedKFold 를 쓴다.** 16차 Stacking·실험 I 의 OOF 가 이 방식이었다. StratifiedKFold 금지 규칙에 걸릴 수 있으니 제출 노트북에서는 Stacking 내부 cv 도 `KFold(n_splits=k)` 객체로 직접 넘기는 것을 권장 (R1 부터 KFold 로 바꿈). 바깥 10-fold 도 `KFold` 인지 재민이 확인할 것
 
 ## 깨어날 때마다 남기는 기록
@@ -82,5 +83,5 @@
 - **확인한 결과**: PR 은 #1~#10 그대로(새 PR 없음). R1·R2·R3 결과 없음. 원인 확인: **예약 실행 안에서 create_trigger 가 '사용자 승인 필요'로 거부됨** → 1~4회차가 만들었다고 적은 실험 세션은 실제로 하나도 생성되지 않았음(list_triggers 에도 없음). 3·4회차 기록은 RESEARCH.md 에 남지 않았고 커밋만 있음(3회차 run_R2.sh 수정, 4회차 R3_stack_kfold.py 추가). 그 사이 메인 세션이 제출용 Stacking 노트북을 만들고 5만/2만 검증 오답 80(약 84분, 3.7GB) 확인. '현재 최고'는 그대로 16차 78. 3회 이상 새 개선 없음 → **정체**
 - **발견(규칙)**: 제출 노트북 셀 7 `cross_val_score(cv=10)`·셀 5 `StackingClassifier(cv=2)` 가 정수 cv → StratifiedKFold. '규칙 확인 필요' 맨 위에 [긴급]으로 적고 재민에게 알림 보냄
 - **읽은 강의와 배운 점**: 맥북 폴더 여전히 접근 불가(connectedFolders 비어 있음, device_list_dir '권한 필요'). 접근 요청은 반복하지 않음. 대신 docs/INDEX.md 의 **W09(학습 곡선·편향/분산)** 와 W03(특성 조합) 요약을 읽음. W09: 학습 곡선에서 검증 오차가 학습 크기에 따라 계속 내려가면 분산 쪽 → 데이터가 더 많은 24만 10-fold(학습 21.6만)에서는 5만 기준 오답보다 확실히 낮아질 것. 그래서 5만 기준 Stacking 78~80 은 실제 10-fold 에서 0.997 이상 기대 가능. 다음 분석 후보로 '학습 크기 1만/2만/5만별 SVC15 오답 곡선'(대기열 7)을 유지. 다음 회차 강의 후보: W06 원본 또는 W12
-- **만든 실험 세션**: 생성 시도(R3) → 승인 필요로 거부. 대신 **R3 kfold2 를 이 세션에서 직접 실행 중**(스모크 통과: 1500/600 오답 5). 결과가 나오면 exp/R3 브랜치에 커밋·PR
+- **만든 실험 세션**: 생성 시도(R3) → 승인 필요로 거부. 대신 **R3 kfold2 를 이 세션에서 직접 실행** → **오답 81** (정수 cv 80 과 동일, 87분, 3.1GB). exp/R3 브랜치, PR #11. 오답쌍 1위는 여전히 5→3(10개)
 - **다음 계획**: R3 결과로 KFold 내부 cv 성능 확인 → 제출 노트북을 KFold 로 고치는 안 제시. 정체 상태이므로 새 실험은 회차당 1개만. 다음 후보: R3 kfold2s(shuffle) 또는 3↔5 전용 특성(대기열 0-1)
