@@ -40,7 +40,7 @@ Memory cgroup out of memory: Killed process 730 (python3) total-vm:6572352kB, an
 - 채점 행렬 B는 `clf.fit` 다음에 만들기 (학습 중 0.79GB 절약).
 - 실행은 메모리 10GB 이상, 1시간 넘게 돌릴 수 있는 곳(로컬 PC나 Colab CPU 런타임)에서 하는 것을 권장. 두 모드를 동시에 돌리면 안 됨.
 
-참고: 시도 2 때 지시대로 `sD_stacking.py`의 LGBM `n_jobs=2 → 1`로 고쳤지만, 이 PR에는 results의 D_ 파일만 넣었으므로 그 수정은 포함하지 않음.
+참고: 시도 2 때 지시대로 `sD_stacking.py`의 LGBM `n_jobs=2 → 1`로 고쳤지만, 효과가 없어서 원래대로 되돌림. 이 PR에는 results의 D_ 파일만 들어 있음.
 
 ## 비교 기준 (참고)
 | 실험 | 오답 (2만 중) | 정확도 | 시간 |
