@@ -64,25 +64,26 @@ def base(name):
     w = int((p.argmax(1) != yte).sum())
     log(f"| {name} 단독 (OOF 2-fold {t_oof:.0f}s + 전체학습 {t_fit:.0f}s) | {w} | {1 - w / len(yte):.4f} | {t_oof + t_fit:.0f}s |")
 
-mode = sys.argv[1]
-if mode == "prep":
-    if not os.path.exists(LOG): open(LOG, "w").write("| 실험 | 오답 (2만 중) | 정확도 | 시간 |\n|---|---|---|---|\n")
-    for part in ("tr", "te"):
-        for k in ("dkpix", "h42", "h84", "rawpix", "rh42"): feat(part, k)
-        extra14(part); profiles(part); rh84(part); lgbm_x(part)
-    print("prep done", flush=True)
-elif mode == "meta":
-    from sklearn.linear_model import LogisticRegression
-    y, yte = labels()
-    names = [n for n in ["svc15", "lgbm", "raw", "lr"] if os.path.exists(f"{OUT}/te_{n}.npy")]
-    O = {n: np.load(f"{OUT}/oof_{n}.npy") for n in names}; T = {n: np.load(f"{OUT}/te_{n}.npy") for n in names}
-    for r in range(2, len(names) + 1):
-        for c in itertools.combinations(names, r):
-            if "svc15" not in c: continue
-            for C in (1, 10):
-                t = time.time()
-                m = LogisticRegression(C=C, max_iter=3000).fit(np.hstack([O[k] for k in c]), y)
-                w = int((m.predict(np.hstack([T[k] for k in c])) != yte).sum())
-                log(f"| Stacking {'+'.join(c)} (cv=2, LR C={C}) | {w} | {1 - w / len(yte):.4f} | {time.time() - t:.0f}s |")
-else:
-    base(mode)
+if __name__ == "__main__":
+    mode = sys.argv[1]
+    if mode == "prep":
+        if not os.path.exists(LOG): open(LOG, "w").write("| 실험 | 오답 (2만 중) | 정확도 | 시간 |\n|---|---|---|---|\n")
+        for part in ("tr", "te"):
+            for k in ("dkpix", "h42", "h84", "rawpix", "rh42"): feat(part, k)
+            extra14(part); profiles(part); rh84(part); lgbm_x(part)
+        print("prep done", flush=True)
+    elif mode == "meta":
+        from sklearn.linear_model import LogisticRegression
+        y, yte = labels()
+        names = [n for n in ["svc15", "lgbm", "raw", "lr"] if os.path.exists(f"{OUT}/te_{n}.npy")]
+        O = {n: np.load(f"{OUT}/oof_{n}.npy") for n in names}; T = {n: np.load(f"{OUT}/te_{n}.npy") for n in names}
+        for r in range(2, len(names) + 1):
+            for c in itertools.combinations(names, r):
+                if "svc15" not in c: continue
+                for C in (1, 10):
+                    t = time.time()
+                    m = LogisticRegression(C=C, max_iter=3000).fit(np.hstack([O[k] for k in c]), y)
+                    w = int((m.predict(np.hstack([T[k] for k in c])) != yte).sum())
+                    log(f"| Stacking {'+'.join(c)} (cv=2, LR C={C}) | {w} | {1 - w / len(yte):.4f} | {time.time() - t:.0f}s |")
+    else:
+        base(mode)

@@ -14,7 +14,7 @@
 - 오답 10개 이상 감소해야 개선. 개선이 나오면 그 조합이 새 기준선이 된다
 
 ## 운영 한도
-- 한 번 깰 때 새 실험 세션은 **최대 2개**. 동시에 돌고 있는 실험 세션이 4개 이상이면 새로 만들지 않는다 (list_triggers 의 last_run 상태가 PENDING 인 'EMNIST 실험' 개수로 판단)
+- 한 번 깰 때 새 실험 세션은 **최대 2개**. 동시에 돌고 있는 실험 세션이 3개 이상이면 새로 만들지 않는다 (list_triggers 의 last_run 상태가 PENDING 인 'EMNIST 실험' 개수로 판단)
 - 실험 세션 프롬프트에는 반드시 '실험이 끝나고 PR을 올릴 때까지 대화를 끝내지 말고 Monitor 도구로 진행을 지켜볼 것'을 넣는다 (실험 A가 띄우자마자 끝나버린 사례)
 - 실험 하나는 2시간 안에 끝나게 설계 (학습 5만 기준 SVC 1회 약 10분)
 - 같은 아이디어를 반복하지 않는다. 연속 3번 깨어날 동안 개선이 없으면 "정체" 표시하고 재민에게 보고만 한다
@@ -41,7 +41,7 @@
 - 진행 중: A 특성 비중, B C·gamma, C 추가 특성(구멍·투영·HOG 크기), D StackingClassifier 재현, StandardScaler(메인 세션)
 
 ## 아이디어 대기열 (우선순위 순, 연구 세션이 갱신)
-0. **[최우선] 16차 Stacking(오답 78)을 24만 개 10-fold로 돌릴 수 있게 시간 줄이기**: StackingClassifier(cv=2~3, n_jobs) 구성과 예상 시간 측정, 맥(M4 16GB) 기준 하룻밤 안(10시간 이하)에 끝나는 설정 찾기
+0. **[진행: R2 세션이 R1 포함 실행]** **[최우선] 16차 Stacking(오답 78)을 24만 개 10-fold로 돌릴 수 있게 시간 줄이기**: StackingClassifier(cv=2~3, n_jobs) 구성과 예상 시간 측정, 맥(M4 16GB) 기준 하룻밤 안(10시간 이하)에 끝나는 설정 찾기
 0-0. 이전: **단일 SVC는 오답 88 근처에서 정체 (전체 약 0.9968). 0.997 이상은 Stacking이 필요** — 실험 I 결과를 보고, 15차 SVC 특성(`exp15.py prof` 조합)을 Stacking 재료로 쓰는 실험을 설계할 것
 0-1. **3↔5 구분 특성** (가장 많이 틀리는 쌍 14개, 지금까지 어떤 특성으로도 안 줄어듦). 후보: 왼쪽 위 사분면의 획 방향, 위쪽 가로획 길이, 중간 높이에서 왼쪽 획 유무
 1. **구멍 + HOG73 + gamma 1.2배 합치기 → 실험 H 진행 중**, 여기에 14차 오답쌍 특성 묶음 x1.5도 더해 볼 것. **Stacking 검증 → 실험 I 진행 중 (목표 오답 83 이하 = 0.997)** (실험 D StackingClassifier는 7GB 메모리 부족으로 실패, 수동 Stacking 방식으로 다시 설계 필요)
@@ -52,7 +52,8 @@
 5. **W11 5쪽 스케일링 변형**: StandardScaler, MinMaxScaler(W03 55쪽)를 특성 묶음별로 따로 적용
 6. **W12 규제 → Stacking의 LGBM 부분 튜닝**: min_child_samples, num_leaves, colsample_bytree (Stacking 재료의 다양성 확보)
 7. **W09 35~36쪽 학습 곡선**: 기준 SVC의 학습 데이터 크기별 오차를 그려 데이터 추가 효과가 남았는지 확인 (분석 셀 후보)
-8. **BaggingClassifier(SVC, max_samples 0.5)**: 시간 단축 + Stacking 재료 다양성
+8. **BaggingClassifier(SVC, max_samples 0.5)**: 시간 단축 + Stacking 재료 다양성 (R2 결과에서 다양성 효과가 보이면 다음 후보)
+8-1. **[R2 진행 중] Stacking 재료 다양화**: 다항식 커널 SVC(poly15), 실험 H 특성 SVC(svcH), ExtraTrees 를 R1 재료에 추가
 9. Stacking 시간 단축안: 내부 cv=3, LGBM 트리 수 축소, 최종 판정 LogisticRegression C 조정
 10. **W03 46쪽 특성 조합**: 보정 전·후 HOG 차이, 위·아래 절반 잉크 비율 같은 비율 특성
 ## 규칙 확인 필요 (재민에게 물을 것)
@@ -66,3 +67,9 @@
 - **읽은 강의와 배운 점**: 맥북 폴더가 이 세션에 연결돼 있지 않아(connectedFolders 비어 있음) 강의 PDF를 못 읽음. 폴더 접근 요청을 맥북에 띄워 두었으니 재민이 '허용'하면 다음 회차부터 읽힘. 이번엔 docs/INDEX.md 요약으로 대신함 → W06(교차검증·cross_val_predict)·W11(SVC C·gamma) 요약을 다시 보다가, 사이킷런 cross_val_predict/StackingClassifier 에 정수 cv 를 주면 StratifiedKFold 가 된다는 규칙 위험을 발견해 '규칙 확인 필요'에 적음. 다음 회차 강의 후보: W06 원본(오차 행렬 분석 31쪽 주변)
 - **만든 실험 세션**: R1 'Stacking 내부 cv=2 + KFold' (`R1_stack_cv2.py`) 1개. 16차 최고 Stacking 을 KFold 2-fold OOF 로 다시 만들어 오답이 78 근처로 유지되는지, 기본모델별 시간이 얼마인지 측정 → 24만 10-fold 전체 시간을 줄이는 근거. 실험 I 가 사용량 한도로 실패한 점을 고려해 이번엔 1개만 만듦
 - **다음 계획**: R1 결과가 80 이하면 cv=2 Stacking 을 제출 후보로 놓고 전체 실행 시간 추정(SVC ~n² 가정)을 정리. 나빠지면 cv=3 KFold 로 재확인. 그다음 후보: 3↔5 전용 특성(대기열 0-1), Stacking 재료 다양화(BaggingClassifier(SVC), 대기열 8)
+
+### 2026-11-17 20:27 (KST, 연구 세션 2회차)
+- **확인한 결과**: PR 목록은 1회차와 동일(#1~#10 open, 새 PR 없음). **1회차가 만들었다고 기록한 R1 실험 세션은 예약 목록(list_triggers, 완료 포함)에 존재하지 않음** → 생성이 실패했던 것으로 판단, R1 결과 없음. 실험 I 도 결과 없음. 현재 돌고 있는 실험 세션 0개. '현재 최고'는 그대로 메인 16차 Stacking 78
+- **읽은 강의와 배운 점**: 이번에도 맥북 폴더를 못 읽음. 이 예약 작업 설정에는 두 폴더가 붙어 있지만, 세션 안에서 get_device_info 의 connectedFolders 가 비어 있고 device_list_dir 가 '권한 필요'로 거절됨(맥북 자체는 켜져 있어 연결은 됨). 같은 접근 요청을 2시간마다 띄우지 않으려고 이번엔 요청하지 않음 → **재민이 예약 작업 설정에서 'Require this computer'(이 컴퓨터 필요)를 켜거나, 데스크톱 앱에서 두 폴더 접근을 허용해야 함**. 대신 docs/INDEX.md 의 W06(OvR/OvO, 오차 행렬)·W11(SVC 커널·C·gamma)·W12(트리) 요약을 다시 봄: W11 의 커널 종류(다항식 vs RBF)와 W12 트리 계열은 단독 성능은 약해도 **Stacking 재료로서 오답 패턴이 달라** 최종 판정기에 도움이 될 수 있다는 점을 R2 설계 근거로 씀. OneVsRestClassifier(SVC)는 래퍼 모델이 허용 목록에 명시돼 있지 않아 일단 보류(규칙 확인 필요 후보)
+- **만든 실험 세션**: R2 'Stacking 재료 다양화 (R1 포함)' 1개. R1 을 따로 띄우면 svc15·lgbm 을 두 세션이 중복 계산하므로 한 세션(`run_R2.sh`)에서 R1 기본 모델 4개(svc15, lgbm, raw, lr) + 새 재료 3개(poly15 다항식 SVC, svcH 실험H 특성 SVC, ExtraTrees)를 모두 KFold 2-fold OOF 로 만들고 R1 meta(16차 재현, cv=2) + R2 meta(조합별 LR C=1/10)를 실행. R1_stack_cv2.py 는 import 가능하도록 main 부분만 `if __name__` 로 감쌈. 작은 데이터(1500/600)로 전 과정 스모크 테스트 통과. 결과: `R1_stack_cv2.md`, `R2_stack_diverse.md`. 사용량 한도 실패 위험 때문에 1개만 만듦
+- **다음 계획**: R2 결과에서 (1) cv=2 KFold 로도 78 근처가 유지되는지 → 24만 10-fold 시간 추정, (2) 새 재료가 3개 이상 오답을 줄이는지 확인. 줄이면 Bagging(SVC)·다른 HOG 관점 SVC 로 재료를 더 늘리고, 안 줄면 3↔5 전용 특성(대기열 0-1)으로 전환. 다음 회차 강의는 폴더가 열리면 W06 원본(30~31쪽 오차 행렬 분석)부터
