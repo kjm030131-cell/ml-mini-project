@@ -29,7 +29,10 @@
 | 기준 + gamma 1.2배 (실험 B) | 95 | C 1~100 넓게 봐도 94~96으로 평탄 (실험 E) |
 | 기준 + 구멍 x1 (실험 C) | 92 | 메인 세션 x1.5도 92, x3은 95 |
 | 기준 + HOG 7칸/3이동 (실험 C) | 92 | |
-| Stacking SVC + LGBM + 원본SVC (수동) | 85 | 유일한 확실한 개선, 전체 실행 17~20시간 |
+| Stacking SVC + LGBM + 원본SVC (수동) | 85 | 전체 실행 17~20시간 |
+| 실험 H: 기준 + 구멍 + HOG73, gamma 1.2배 | 89 | 단일 SVC, 판정 기준(90 이하) 통과 |
+| 메인 15차: 기준 + 14차 오답쌍 특성 x1.5 + 윤곽선(프로파일) 112, g1.2 (`exp15.py prof`) | 88 | **단일 SVC 최고** (약 0.9956) |
+| **메인 16차: Stacking svc15 + LGBM + 원본SVC + LR (최종 LR C=1~10, 내부 cv=3)** | **78** | **현재 최고** (약 0.9961, 기준 대비 −22). 전체 24만 10-fold 실행 시간 미확인 |
 
 ## 이미 해본 것 (반복 금지)
 - SVC: C 10/30, gamma 1·2배, 다항식 커널 3·4차, 제곱근 변환, HOG 12방향, 크기 정규화 특성(단독·추가)
@@ -53,7 +56,13 @@
 9. Stacking 시간 단축안: 내부 cv=3, LGBM 트리 수 축소, 최종 판정 LogisticRegression C 조정
 10. **W03 46쪽 특성 조합**: 보정 전·후 HOG 차이, 위·아래 절반 잉크 비율 같은 비율 특성
 ## 규칙 확인 필요 (재민에게 물을 것)
-- (없음)
+- **[중요] `cross_val_predict(..., cv=3)` 와 `StackingClassifier(cv=3)` 처럼 cv 에 정수를 주면 사이킷런은 분류기에서 자동으로 StratifiedKFold 를 쓴다.** 16차 Stacking·실험 I 의 OOF 가 이 방식이었다. StratifiedKFold 금지 규칙에 걸릴 수 있으니 제출 노트북에서는 Stacking 내부 cv 도 `KFold(n_splits=k)` 객체로 직접 넘기는 것을 권장 (R1 부터 KFold 로 바꿈). 바깥 10-fold 도 `KFold` 인지 재민이 확인할 것
 
 ## 깨어날 때마다 남기는 기록
 <!-- 형식: ### YYYY-MM-DD HH:MM / 확인한 결과 / 배운 점 / 새로 만든 실험 세션 / 다음 계획 -->
+
+### 2026-11-17 18:30 (KST, 연구 세션 1회차)
+- **확인한 결과**: PR #1~#10 모두 open. 실험 H(PR #10) 최저 오답 88~89(구멍+HOG73+g1.2) → 판정 기준 통과. F·G·E·C·B·A2 는 개선 없음, D 는 메모리 부족 실패. 실험 I(sI_stack.py)는 사용량 한도(USAGE_LIMIT)로 세션이 실패해 결과·PR 없음. 메인 세션 15차 단일 SVC 88, **16차 Stacking(svc15+lgbm+raw+lr) 78 → '현재 최고' 갱신**
+- **읽은 강의와 배운 점**: 맥북 폴더가 이 세션에 연결돼 있지 않아(connectedFolders 비어 있음) 강의 PDF를 못 읽음. 폴더 접근 요청을 맥북에 띄워 두었으니 재민이 '허용'하면 다음 회차부터 읽힘. 이번엔 docs/INDEX.md 요약으로 대신함 → W06(교차검증·cross_val_predict)·W11(SVC C·gamma) 요약을 다시 보다가, 사이킷런 cross_val_predict/StackingClassifier 에 정수 cv 를 주면 StratifiedKFold 가 된다는 규칙 위험을 발견해 '규칙 확인 필요'에 적음. 다음 회차 강의 후보: W06 원본(오차 행렬 분석 31쪽 주변)
+- **만든 실험 세션**: R1 'Stacking 내부 cv=2 + KFold' (`R1_stack_cv2.py`) 1개. 16차 최고 Stacking 을 KFold 2-fold OOF 로 다시 만들어 오답이 78 근처로 유지되는지, 기본모델별 시간이 얼마인지 측정 → 24만 10-fold 전체 시간을 줄이는 근거. 실험 I 가 사용량 한도로 실패한 점을 고려해 이번엔 1개만 만듦
+- **다음 계획**: R1 결과가 80 이하면 cv=2 Stacking 을 제출 후보로 놓고 전체 실행 시간 추정(SVC ~n² 가정)을 정리. 나빠지면 cv=3 KFold 로 재확인. 그다음 후보: 3↔5 전용 특성(대기열 0-1), Stacking 재료 다양화(BaggingClassifier(SVC), 대기열 8)
