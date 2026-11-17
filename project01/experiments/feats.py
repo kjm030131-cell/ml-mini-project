@@ -94,3 +94,81 @@ def parts_all(Xraw, chunk=10000):
                  h42b12=hog2(dk,4,2,12), snpix=sn.reshape(len(sn),-1), sn42=hog2(sn,4,2))
         for k,v in q.items(): P.setdefault(k, []).append(v.astype(np.float32))
     return {k: np.vstack(v) for k,v in P.items()}
+
+# --- 질감 특성 (실험 F) ---
+def lbp_feat(imgs, cell=7):
+    # 각 픽셀이 이웃 8개 중 몇 개보다 밝은지(0~8)를 7x7 칸마다 히스토그램 → 16칸 x 9 = 144
+    p = np.pad(imgs, ((0, 0), (1, 1), (1, 1)))
+    c = imgs
+    cnt = np.zeros_like(imgs, dtype=np.int8)
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            if dy == 0 and dx == 0: continue
+            cnt += (p[:, 1 + dy:29 + dy, 1 + dx:29 + dx] >= c).astype(np.int8)
+    cnt = np.where(c > 0.05, cnt, -1)          # 배경은 제외
+    n = len(imgs); g = 28 // cell
+    out = np.zeros((n, g, g, 9), np.float32)
+    for k in range(9):
+        out[..., k] = (cnt == k).reshape(n, g, cell, g, cell).sum(axis=(2, 4))
+    tot = out.sum(-1, keepdims=True) + 1e-6
+    return (out / tot).reshape(n, -1)
+
+def gabor_feat(imgs, cell=7):
+    # 4방향 x 2주파수 가보르 필터 반응 크기를 7x7 칸마다 평균 → 8 x 16 = 128
+    feats = []
+    yy, xx = np.mgrid[-4:5, -4:5].astype(np.float32)
+    for lam in (4.0, 7.0):
+        for th in (0, np.pi / 4, np.pi / 2, 3 * np.pi / 4):
+            xr = xx * np.cos(th) + yy * np.sin(th); yr = -xx * np.sin(th) + yy * np.cos(th)
+            k = np.exp(-(xr ** 2 + yr ** 2) / (2 * (lam / 2) ** 2)) * np.cos(2 * np.pi * xr / lam)
+            k -= k.mean()
+            r = np.abs(ndimage.convolve(imgs, k[None], mode="constant"))
+            n = len(imgs); g = 28 // cell
+            feats.append(r.reshape(n, g, cell, g, cell).mean(axis=(2, 4)).reshape(n, -1))
+    f = np.hstack(feats)
+    return f / (f.max(axis=1, keepdims=True) + 1e-6)
+
+# --- HOG 계산 방식 개선 (실험 G) ---
+def _grad(imgs, sigma=0.0):
+    if sigma > 0: imgs = ndimage.gaussian_filter(imgs, (0, sigma, sigma))
+    gy, gx = np.gradient(imgs, axis=(1, 2))
+    return gx, gy
+
+def hog3(imgs, cell=4, stride=2, bins=9, signed=False, sigma=0.0):
+    # hog2 + 부호 있는 방향(0~360도) 옵션 + 계산 전 가우시안 흐림 옵션
+    gx, gy = _grad(imgs, sigma)
+    mag = np.sqrt(gx ** 2 + gy ** 2)
+    rng = 2 * np.pi if signed else np.pi
+    ang = (np.arctan2(gy, gx) % rng) / rng * bins - 0.5
+    lo = np.floor(ang).astype(np.int32); w = (ang - lo).astype(np.float32)
+    n = len(imgs); pos = range(0, 28 - cell + 1, stride)
+    hist = np.zeros((n, len(pos), len(pos), bins), dtype=np.float32)
+    for k in range(bins):
+        m = mag * ((lo % bins == k) * (1 - w) + ((lo + 1) % bins == k) * w)
+        c = np.cumsum(np.cumsum(np.pad(m, ((0, 0), (1, 0), (1, 0))), axis=1), axis=2)
+        for a, i in enumerate(pos):
+            for b, j in enumerate(pos):
+                hist[:, a, b, k] = c[:, i + cell, j + cell] - c[:, i, j + cell] - c[:, i + cell, j] + c[:, i, j]
+    norm = np.sqrt((hist ** 2).sum(axis=-1, keepdims=True)) + 1e-6
+    return (hist / norm).reshape(n, -1)
+
+def hog_dt(imgs, cell=4, bins=9, sigma=0.0):
+    # Dalal-Triggs 방식: 겹치지 않는 칸 히스토그램 → 2x2 칸 묶음(블록)마다 L2-Hys 정규화
+    gx, gy = _grad(imgs, sigma)
+    mag = np.sqrt(gx ** 2 + gy ** 2)
+    ang = (np.arctan2(gy, gx) % np.pi) / np.pi * bins - 0.5
+    lo = np.floor(ang).astype(np.int32); w = (ang - lo).astype(np.float32)
+    n = len(imgs); g = 28 // cell; s = g * cell
+    hist = np.zeros((n, g, g, bins), np.float32)
+    for k in range(bins):
+        m = mag * ((lo % bins == k) * (1 - w) + ((lo + 1) % bins == k) * w)
+        hist[..., k] = m[:, :s, :s].reshape(n, g, cell, g, cell).sum(axis=(2, 4))
+    blocks = []
+    for i in range(g - 1):
+        for j in range(g - 1):
+            v = hist[:, i:i + 2, j:j + 2, :].reshape(n, -1)
+            v = v / (np.sqrt((v ** 2).sum(1, keepdims=True)) + 1e-6)
+            v = np.minimum(v, 0.2)
+            v = v / (np.sqrt((v ** 2).sum(1, keepdims=True)) + 1e-6)
+            blocks.append(v)
+    return np.hstack(blocks)
