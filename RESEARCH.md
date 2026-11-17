@@ -56,7 +56,7 @@
 4. **W06 25쪽 OvR vs OvO**: OneVsRestClassifier(SVC) 가 기본 OvO보다 나은지 (학습 시간도 기록)
 5. **W11 5쪽 스케일링 변형**: StandardScaler, MinMaxScaler(W03 55쪽)를 특성 묶음별로 따로 적용
 6. **W12 규제 → Stacking의 LGBM 부분 튜닝**: min_child_samples, num_leaves, colsample_bytree (Stacking 재료의 다양성 확보)
-7. **W09 35~36쪽 학습 곡선**: 기준 SVC의 학습 데이터 크기별 오차를 그려 데이터 추가 효과가 남았는지 확인 (분석 셀 후보)
+7. **[R5 진행 중, 7회차] W09 35~36쪽 학습 곡선**: 15차 SVC 를 학습 1.25만/2.5만/5만/10만으로 늘려 오답·학습 시간 측정 → 21.6만 학습(실제 10-fold) 성능·시간 외삽 (`R5_learning_curve.py`)
 8. **BaggingClassifier(SVC, max_samples 0.5)**: 시간 단축 + Stacking 재료 다양성 (R2 결과에서 다양성 효과가 보이면 다음 후보)
 8-1. **[R2 진행 중] Stacking 재료 다양화**: 다항식 커널 SVC(poly15), 실험 H 특성 SVC(svcH), ExtraTrees 를 R1 재료에 추가
 9. Stacking 시간 단축안: 내부 cv=3, LGBM 트리 수 축소, 최종 판정 LogisticRegression C 조정
