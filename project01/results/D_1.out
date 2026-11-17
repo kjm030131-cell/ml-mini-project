@@ -1,0 +1,15 @@
+# 실험 D_1 (python3 sD_stacking.py 1) 실행 로그 — 세션 D, 2026-11-17
+# 스크립트 자체 출력은 없음(결과 줄 출력 전에 프로세스가 강제 종료됨). 셸/커널 로그만 기록.
+
+## 시도 1 (LGBM n_jobs=2, 원본 그대로)
+/bin/bash: line 1:   336 Killed                  python3 sD_stacking.py 1 > ../results/D_1.out 2>&1
+D_1 DONE EXIT=137 ELAPSED=1590s
+[ 1639.041892] Memory cgroup out of memory: Killed process 336 (python3) total-vm:6618980kB, anon-rss:6101492kB, file-rss:2700kB, shmem-rss:0kB
+
+## 시도 2 (LGBM n_jobs=1 로 수정 후 재시도)
+D_1 retry DONE EXIT=137 ELAPSED=6s
+[ 1749.972261] Memory cgroup out of memory: Killed process 581 (python3) total-vm:6572320kB, anon-rss:6101340kB, file-rss:2768kB, shmem-rss:0kB
+
+## 진단 실행 (LGBM n_jobs=1, timeout 90)
+시작 5초 시점 RSS 3,437,324 kB (특성 행렬 A, B 적재 직후) → 수 초 뒤 Killed (rc=137)
+[ 2373.052101] Memory cgroup out of memory: Killed process 730 (python3) total-vm:6572352kB, anon-rss:6100084kB, file-rss:2424kB, shmem-rss:0kB
