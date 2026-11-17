@@ -6,9 +6,9 @@
 | # | 주제 | 지표 | 데이터 |
 |---|---|---|---|
 | 1 | EMNIST 손글씨 숫자 | 10-fold CV 정확도 ↑ | `data/emnist_digits_train_part*.npz` (24만×785) |
-| 2 | 스마트폰 행위 인식(HAR) | 10-fold CV 정확도 ↑ | `train.csv` (7,352×563, subject·Activity 제외 561 특성) |
-| 3 | King County 집값 | 10-fold CV RMSE ↓ | `kc_house_data.csv` (21,613×21, price·date 제외 19 특성) |
-| 4 | 레드와인 품질 | 10-fold CV RMSE ↓ | `winequality-red.csv` (1,599×12) |
+| 2 | 스마트폰 행위 인식(HAR) | 10-fold CV 정확도 ↑ | `data/project02/train.csv.gz` (7,352×563, subject·Activity 제외 561 특성, `pd.read_csv`로 바로 읽힘) |
+| 3 | King County 집값 | 10-fold CV RMSE ↓ | `data/project03/kc_house_data.csv` (21,613×21, price·date 제외 19 특성) |
+| 4 | 레드와인 품질 | 10-fold CV RMSE ↓ | `data/project04/winequality-red.csv` (1,599×12) |
 
 - 공통 규칙: GPU 금지, 강의에서 다룬 알고리즘·모델·코드 안에서. 사용 가능 Grid/Random Search, Stacking. 사용 불가 Resample(증강), PCA, StratifiedKFold. XGB·LGBM은 CPU 버전
 - 제출: `mini_proj_0X_20221329.ipynb`, 모든 셀 실행 후 10-fold 결과 배열과 평균 출력 필수. 지각 불가
