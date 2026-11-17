@@ -38,6 +38,7 @@
 - SVC: C 10/30, gamma 1·2배, 다항식 커널 3·4차, 제곱근 변환, HOG 12방향, 크기 정규화 특성(단독·추가)
 - 모델: LGBM, RandomForest, ExtraTrees, LogisticRegression 단독, 다수결 투표
 - 메인 세션 12·13차: 특성 비중·C 변경 효과 없음(98~101), gamma 0.7배 103(나빠짐), **StandardScaler 207(크게 나빠짐, 0~1 특성에 표준화 금물)**, 구멍 x0.5 97, **구멍 x1.5 92**
+- 메인 17차: Stacking 재료 추가 — ExtraTrees 단독 175, RandomForest 182, LGBM2(600트리, leaves 63) 106, svcG(흐림+부호 HOG SVC) 91. 어떤 조합을 더해도 78~81로 개선 없음. 모든 모델이 틀린 문제 39개. **재료 추가로는 정체**
 - 진행 중: A 특성 비중, B C·gamma, C 추가 특성(구멍·투영·HOG 크기), D StackingClassifier 재현, StandardScaler(메인 세션)
 
 ## 아이디어 대기열 (우선순위 순, 연구 세션이 갱신)
