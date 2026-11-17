@@ -1,0 +1,5 @@
+SVC C=10  deskew pixels                0.9898 fit 45s total 68s nSV 5508
+SVC C=10  deskew HOG4+7                0.9924 fit 46s total 70s nSV 7152
+SVC C=10  HOG4 + deskew HOG4           0.9926 fit 79s total 117s nSV 8415
+SVC C=10  deskew pix + deskew HOG4     0.9929 fit 70s total 111s nSV 5842
+SVC C=10  raw pixels                   0.9833 fit 78s total 116s nSV 9250

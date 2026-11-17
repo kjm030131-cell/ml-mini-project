@@ -1,0 +1,3 @@
+built
+N= 20000 holdout acc 0.9863  258s
+N= 50000 holdout acc 0.9908  634s

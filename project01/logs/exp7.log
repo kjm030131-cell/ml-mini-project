@@ -1,0 +1,8 @@
+/usr/local/lib/python3.13/site-packages/sklearn/svm/_base.py:236: FutureWarning: The `probability` parameter was deprecated in 1.9 and will be removed in version 1.11. Use `CalibratedClassifierCV(SVC(), ensemble=False)` instead of `SVC(probability=True)`
+  warnings.warn(
+SVC proba alone      0.9931  468s
+LGBM alone           0.9930
+VOTE w_svc=0.3       0.9931
+VOTE w_svc=0.5       0.9936
+VOTE w_svc=0.7       0.9941
+both wrong 42 svc wrong 69 lgbm wrong 70

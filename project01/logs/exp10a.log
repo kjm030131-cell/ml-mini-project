@@ -1,0 +1,4 @@
+RESULT base (dkpix+h42+h84)           0.9950  wrong 100/20000  602s
+RESULT sqrt 변환                        0.9951  wrong  97/20000  448s
+RESULT HOG 12방향                       0.9951  wrong  97/20000  795s
+RESULT poly 3차                        0.9945  wrong 109/20000  253s

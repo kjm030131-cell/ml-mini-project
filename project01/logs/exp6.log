@@ -1,0 +1,6 @@
+SVC C=10  g=scale dkpix+dhog4+dhog7          dim  1369 0.9932 fit 86s total 129s
+SVC C=10  g=scale dense HOG(4,2)             dim  1521 0.9938 fit 114s total 168s
+SVC C=10  g=scale dkpix+dense HOG(4,2)       dim  2305 0.9940 fit 226s total 303s
+SVC C=10  g=scale dkpix+HOG(4,2)+HOG(8,4)    dim  2629 0.9943 fit 249s total 339s
+SVC C=30  g=scale dkpix+dense HOG(4,2)       dim  2305 0.9941 fit 213s total 310s
+SVC C=10  g=0.01107999961823225 dkpix+dense HOG(4,2)       dim  2305 0.9943 fit 446s total 639s

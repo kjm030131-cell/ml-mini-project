@@ -1,0 +1,3 @@
+RESULT 크기정규화만 (snpix+sn42)            0.9940  wrong 121/20000  516s
+RESULT gamma x2                       0.9951  wrong  98/20000  1029s
+RESULT poly 4차                        0.9948  wrong 103/20000  319s

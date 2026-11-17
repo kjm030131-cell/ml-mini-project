@@ -1,0 +1,5 @@
+LGBM raw             0.9733  136s
+LGBM simple          0.9748  156s
+LGBM simple+HOG      0.9841  272s
+SVC raw              0.9741  74s
+SVC simple+HOG       0.9771  161s

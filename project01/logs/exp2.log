@@ -1,0 +1,4 @@
+features (20000, 1477)
+HOG+holes 300            0.9854  270s
+HOG+holes 600 nl63       0.9856  509s
+HOG+holes 1000 lr0.05    0.9867  704s

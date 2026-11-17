@@ -1,0 +1,2 @@
+feat 38s
+SVC denseHOG N=120000 holdout 0.9947 fit 706s total 810s nSV 10027
