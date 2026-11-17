@@ -1,0 +1,13 @@
+RESULT stack svc15+lgbm+raw+lr C=1 wrong 78
+RESULT stack svc15+lgbm+raw+lr+svcG+et+rf+lgbm2+svc C=0.3 wrong 78
+RESULT stack svc15+lgbm+raw+lr+et+lgbm2 C=1 wrong 79
+RESULT stack svc15+lgbm+raw+lr+et+lgbm2+svc C=0.3 wrong 79
+RESULT stack svc15+lgbm+raw+lr+et+rf+lgbm2 C=0.3 wrong 79
+RESULT stack svc15+lgbm+raw+lr+et+svc C=0.3 wrong 79
+RESULT stack svc15+lgbm+raw+lr+rf C=1 wrong 79
+RESULT stack svc15+lgbm+raw+lr+rf+lgbm2 C=1 wrong 80
+RESULT stack svc15+lgbm+raw+lr+rf+svc C=0.3 wrong 80
+RESULT stack svc15+lgbm+raw+lr+svcG+et+lgbm2+svc C=0.3 wrong 80
+RESULT stack svc15+lgbm+raw+lr+svcG+et+svc C=0.3 wrong 80
+RESULT stack svc15+lgbm+raw+lr+svcG+rf+lgbm2+svc C=0.3 wrong 80
+RESULT 모든 모델이 틀린 문제 39

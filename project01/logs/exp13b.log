@@ -1,0 +1,2 @@
+RESULT +holes x0.5 (W06 p31)                wrong 97  592s
+RESULT +holes x1.5 (W06 p31)                wrong 92  576s

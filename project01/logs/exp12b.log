@@ -1,0 +1,6 @@
+RESULT pix=1 h42=1 h84=2 C=10 gamma=1.0x  wrong 96  676s
+RESULT pix=0.7 h42=1 h84=1.5 C=10 gamma=1.0x  wrong 100  592s
+RESULT pix=1 h42=1 h84=0.6 C=10 gamma=1.0x  wrong 99  573s
+RESULT pix=1 h42=1 h84=1 C=20 gamma=1.0x  wrong 100  592s
+RESULT pix=1 h42=1 h84=1 C=10 gamma=0.7x  wrong 103  432s
+RESULT pix=0.5 h42=1 h84=1 C=10 gamma=1.0x  wrong 101  522s

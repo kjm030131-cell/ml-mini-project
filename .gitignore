@@ -5,3 +5,6 @@ fcache/
 __pycache__/
 .ipynb_checkpoints/
 .DS_Store
+project01/experiments/cache/
+project01/results/I_cache/
+project01/results/R*_cache/
