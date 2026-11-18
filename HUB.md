@@ -43,3 +43,7 @@
 - 정리: 기준선 100 대비 비교표, 효과 있는 조합 표시
 - 새 실험: exp-infra 브랜치에 스크립트 추가(공통 함수 `common.py`의 `run_svc`) 후, create_trigger(run_once_at)로 새 실험 세션 생성. 프롬프트는 기존 A~D 형식 그대로
 - 무거운 계산은 이 세션에서 직접 돌리지 말고 실험 세션에 맡긴다
+
+## 커밋 작성자 (잔디)
+- 모든 세션은 커밋 전에 `git config user.name "kjm030131-cell"` 와 `git config user.email "235438985+kjm030131-cell@users.noreply.github.com"` 을 설정한다 (재민 계정 잔디에 기록되도록, 개인 이메일 노출 없음)
+- 기록은 exp-infra 에 push 하고 main 에도 같이 반영한다 (`git push origin exp-infra exp-infra:main`)
