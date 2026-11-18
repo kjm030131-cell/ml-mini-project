@@ -1,0 +1,3 @@
+RESULT svc15              wrong 349 / 100000  acc 0.99651  3570s
+RESULT svc15+h73          wrong 340 / 100000  acc 0.99660  4217s
+RESULT svc15 hog12방향      wrong 380 / 100000  acc 0.99620  4357s
