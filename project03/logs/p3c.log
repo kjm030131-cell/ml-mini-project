@@ -1,0 +1,3 @@
+Voting XGB + LGBM(log)                 105992  282s
+Voting 4개                              106152  546s
+Stacking 4개 (LR 판정)                    105563  3312s

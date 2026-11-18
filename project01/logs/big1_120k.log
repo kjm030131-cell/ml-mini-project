@@ -1,0 +1,2 @@
+RESULT N=120000 기준(보정+HOG2) gamma1           wrong 86 / 20000  1609s
+RESULT N=120000 svc15 gamma1.2               wrong 79 / 20000  1624s

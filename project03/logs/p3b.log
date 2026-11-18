@@ -1,0 +1,4 @@
+XGB 위치특성                               107860  143s
+XGB 위치특성 log(price)                    109089  167s
+LGBM 위치특성                              108933  134s
+LGBM 위치특성 log(price)                   107264  127s
