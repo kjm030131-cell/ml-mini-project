@@ -20,23 +20,28 @@ df_train_cat = df_train[["Activity"]]
 ordinal_encoder = OrdinalEncoder()
 y_train = ordinal_encoder.fit_transform(df_train_cat).flatten()
 ordinal_encoder.categories_''',
-'''df_train_num = df_train.drop(["subject", "Activity"], axis=1)
-subject = df_train["subject"]
+'''# 특성 엔지니어링 (누수 방지): 교차검증의 각 fold 안에서, 그 fold 에 들어온 행만으로 계산한다
+#  같은 사람의 앞뒤 측정 구간 평균 (짧은 창 9, 긴 창 51) 을 원본 특성에 덧붙인다
+#  정답(Activity)은 사용하지 않고, 학습 fold 와 시험 fold 의 값이 서로 섞이지 않는다 (subject 는 묶음 기준으로만 쓰고 특성에서는 뺌)
+def har_features(X):
+    subject = X["subject"]
+    num = X.drop(columns=["subject"])
+    parts = [num.to_numpy()]
+    for w in [9, 51]:
+        roll = num.copy()
+        for s in subject.unique():
+            idx = (subject == s).to_numpy()
+            roll.loc[idx] = num.loc[idx].rolling(w, center=True, min_periods=1).mean()
+        parts.append(roll.to_numpy())
+    return np.hstack(parts)
 
-# 특성 엔지니어링 1: 사람별 평균 빼기 (사람마다 다른 폰 착용 각도·걸음 습관 제거, subject 는 묶음 기준으로만 사용)
-df_center = df_train_num - df_train_num.groupby(subject).transform("mean")
-
-# 특성 엔지니어링 2: 같은 사람의 앞뒤 측정 구간 평균 (짧은 창 5, 긴 창 75)
-def rolling_mean(df, w):
-    return df.groupby(subject).transform(lambda s: s.rolling(w, center=True, min_periods=1).mean())
-
-X_train = np.hstack([df_center.to_numpy(), rolling_mean(df_center, 5).to_numpy(), rolling_mean(df_center, 75).to_numpy()])
-X_raw = df_train_num.to_numpy()
-X_train.shape''',
-'''from sklearn.model_selection import KFold, cross_val_score
-
-kfold = KFold(n_splits=10, shuffle=True, random_state=42)''',
-'''# 1) 모델 비교: 원본 특성 vs 내 특성, 여러 분류 모델 (10-fold)
+X_all = df_train.drop(["Activity"], axis=1)          # 561 특성 + subject
+X_raw = df_train.drop(["subject", "Activity"], axis=1).to_numpy()
+har_features(X_all.iloc[:500]).shape''',
+'''# 1) 모델 비교: 원본 특성 vs 내 특성, 여러 분류 모델 (10-fold, 섞지 않음)
+from sklearn.model_selection import cross_val_score
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import FunctionTransformer
 from sklearn.linear_model import SGDClassifier, LogisticRegression
 from sklearn.svm import LinearSVC, SVC
 from sklearn.tree import DecisionTreeClassifier
@@ -51,29 +56,29 @@ models = {
     "SVC": SVC(C=10),
 }
 for name, model in models.items():
-    raw = cross_val_score(model, X_raw, y_train, cv=kfold, scoring="accuracy").mean()
-    fe = cross_val_score(model, X_train, y_train, cv=kfold, scoring="accuracy").mean()
+    raw = cross_val_score(model, X_raw, y_train, cv=10, scoring="accuracy").mean()
+    fe = cross_val_score(make_pipeline(FunctionTransformer(har_features), model), X_all, y_train, cv=10, scoring="accuracy").mean()
     print(f"{name:20s} 원본 {raw:.4f}   내 특성 {fe:.4f}")''',
 '''# 2) 하이퍼파라미터 탐색: 가장 좋은 SVC 의 C, gamma (Grid Search, 5-fold)
 from sklearn.model_selection import GridSearchCV
 
-param_grid = {"C": [1, 10, 100], "gamma": ["scale", 0.0002, 0.001]}
-grid_search = GridSearchCV(SVC(), param_grid, cv=KFold(n_splits=5, shuffle=True, random_state=42),
-                           scoring="accuracy", n_jobs=-1)
-grid_search.fit(X_train, y_train)
+pipe = make_pipeline(FunctionTransformer(har_features), SVC())
+param_grid = {"svc__C": [10, 100, 1000], "svc__gamma": ["scale", 0.0005, 0.002]}
+grid_search = GridSearchCV(pipe, param_grid, cv=5, scoring="accuracy", n_jobs=-1)
+grid_search.fit(X_all, y_train)
 print(grid_search.best_params_, grid_search.best_score_)
 for mean, params in zip(grid_search.cv_results_["mean_test_score"], grid_search.cv_results_["params"]):
     print(f"{mean:.4f}", params)''',
-'''# 3) 최종 모델 10-fold 교차 검증
+'''# 3) 최종 모델 10-fold 교차 검증 (섞지 않음)
 final_clf = grid_search.best_estimator_
 
-cv_res = cross_val_score(final_clf, X_train, y_train, cv=kfold, scoring="accuracy")
+cv_res = cross_val_score(final_clf, X_all, y_train, cv=10, scoring="accuracy")
 cv_res''',
 '''np.mean(cv_res)''',
 '''from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import confusion_matrix
 
-y_pred = cross_val_predict(final_clf, X_train, y_train, cv=kfold)
+y_pred = cross_val_predict(final_clf, X_all, y_train, cv=10)
 confusion_matrix(y_train, y_pred)'''],"/home/claude/nb234/mini_proj_02_20221329.ipynb")
 
 # ================= 공통 회귀 셀 =================
@@ -104,7 +109,7 @@ df.info()''',
     d = pd.to_datetime(df["date"].str[:8])                 # date 는 숫자로 변환해 사용
     X["sale_year"] = d.dt.year
     X["sale_month"] = d.dt.month
-    X["sale_t"] = (d - d.min()).dt.days
+    X["sale_t"] = (d - pd.Timestamp("2014-01-01")).dt.days   # 고정 기준일
     X["age"] = X["sale_year"] - X["yr_built"]
     X["renov"] = (X["yr_renovated"] > 0).astype(int)
     X["since_renov"] = np.where(X["yr_renovated"] > 0, X["sale_year"] - X["yr_renovated"], X["age"])
