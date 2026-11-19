@@ -1,0 +1,8 @@
+sw73 features (120000, 3953) 108s gamma 3.022e-03
+sw73 fit 1320s SV 8310
+  sw73 chunk 120000: wrong 72
+  sw73 chunk 140000: wrong 71
+  sw73 chunk 160000: wrong 66
+  sw73 chunk 180000: wrong 75
+  sw73 chunk 200000: wrong 66
+RESULT | svc15+HOG73 + 획두께정규화 HOG73 x1 | 350 / 100,000 | 0.99650 | [72, 71, 66, 75, 66] | 1320s | 4556s | 4961MB | [((9, 7), 26), ((3, 2), 14), ((4, 9), 13), ((6, 0), 13), ((3, 5), 13)] |
