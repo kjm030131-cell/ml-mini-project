@@ -1,0 +1,8 @@
+raw84 features (120000, 3701) 120s gamma 3.172e-03
+raw84 fit 1197s SV 8472
+  raw84 chunk 120000: wrong 75
+  raw84 chunk 140000: wrong 74
+  raw84 chunk 160000: wrong 70
+  raw84 chunk 180000: wrong 72
+  raw84 chunk 200000: wrong 59
+RESULT | svc15+HOG73 + 보정전 HOG84 x1 | 350 / 100,000 | 0.99650 | [75, 74, 70, 72, 59] | 1197s | 4870s | 4807MB | [((9, 7), 22), ((4, 9), 16), ((9, 4), 15), ((3, 5), 15), ((3, 2), 14)] |
