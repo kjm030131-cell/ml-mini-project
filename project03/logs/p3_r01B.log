@@ -1,0 +1,3 @@
+| 조합 | 10-fold RMSE | fold 표준편차 | 시간 |
+|---|---|---|---|
+| 중첩 RandomizedSearch(10회, 내부 KFold5) LGBM log | 107,885 | 12,885 | 1344s |

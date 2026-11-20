@@ -1,0 +1,6 @@
+| 조합 | 10-fold RMSE | fold 표준편차 | 시간 |
+|---|---|---|---|
+| XGB log 고정 | 109,136 | 14,509 | 61s |
+| KMeans60 + XGB log | 108,240 | 14,157 | 164s |
+| zipcode 범주형 + LGBM log | 109,611 | 14,039 | 41s |
+| KMeans60 + Stacking 4개 (내부 KFold5) | 105,315 | 12,223 | 1622s |

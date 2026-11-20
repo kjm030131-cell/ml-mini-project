@@ -1,0 +1,14 @@
+| 조합 | 10-fold 평균 | 최저 fold | 시간 |
+|---|---|---|---|
+| [S] SVC C=100 gamma 0.3배 | 0.9452 | 0.883 | 13s |
+| [S] SVC C=100 gamma 3배 | 0.9480 | 0.895 | 20s |
+| [S] LGBM 500 | 0.9253 | 0.867 | 389s |
+| [S] Stacking SVC+LR+LGBM → LR (내부 KFold5) | 0.9380 | 0.850 | 1748s |
+
+오차 행렬 (SVC C=100, 행=정답) ['LAYING', 'SITTING', 'STANDING', 'WALKING', 'WALKING_DOWNSTAIRS', 'WALKING_UPSTAIRS']
+[[1407    0    0    0    0    0]
+ [   3 1209   73    0    0    1]
+ [   0   97 1277    0    0    0]
+ [   0    0    0 1140   15   71]
+ [   0    0    0   20  930   36]
+ [   0    0    0   24   41 1008]]
