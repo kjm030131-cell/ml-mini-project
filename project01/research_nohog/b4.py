@@ -1,0 +1,7 @@
+exec(open('/home/claude/r1/feats.py').read())
+SN=cache('sn', lambda: P(sizenorm(dk)))
+sq=lambda a: np.sqrt(np.clip(a,0,None))
+run('D1_sqrt_base+sqrtSN',np.hstack([P(sq(dk)), SF()*1.5, PF(), sq(SN)]))
+run('D2_sqrt_base_g2.5',np.hstack([P(sq(dk)), SF()*1.5, PF()]),gm=2.5)
+run('D3_pow0.33_base',np.hstack([P(np.clip(dk,0,None)**0.33), SF()*1.5, PF()]))
+run('D4_sqrt_base_C20',np.hstack([P(sq(dk)), SF()*1.5, PF()]),C=20)
