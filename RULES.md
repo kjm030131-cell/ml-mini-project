@@ -27,13 +27,13 @@
 - 2번: 같은 사람의 앞뒤 구간 이동평균(rolling) 특성은 시험 fold 의 다른 행을 쓰므로 **사용하지 않음**
 - gamma 등 하이퍼파라미터를 전체 데이터 분산으로 계산하지 않고 Grid Search 로 고른다
 
-## 5. 현재 제출 노트북 상태 (2026-11-26)
+## 5. 현재 제출 노트북 상태 (2026-11-28 갱신)
 | 프로젝트 | 10-fold 평균 (shuffle=True) | 모델 | 상태 |
 |---|---|---|---|
 | 1 | 미실행 (예상 약 0.994) | deskew 픽셀 + 획 특성 + 윤곽 프로파일 → SVC, HOG 없음 | 맥에서 실행 필요 (약 수 시간) |
-| 2 | **0.9931** (정확도) | 원본 561 특성 → SVC(C=30, gamma=0.02) | 실행 완료 |
-| 3 | **106,003** (RMSE) | XGB·LGBM(원래/log 가격) 4개 Stacking, 21,613행 전부 | 실행 완료 |
-| 4 | **0.5446** (RMSE) | ExtraTrees + XGB Voting(2:1) | 실행 완료 |
+| 2 | **0.9958** (정확도) | 원본 561 특성 → Stacking(SVC C=30 g=0.02 + LGBM 1500) → LogisticRegression | 실행 완료 (이전 SVC 단독 0.9931) |
+| 3 | **106,003** (RMSE) | XGB·LGBM(원래/log 가격) 4개 Stacking, 21,613행 전부 | 실행 완료 (추가 연구에서 개선 없음) |
+| 4 | **0.5429** (RMSE) | Stacking(ExtraTrees + XGB + RF + SVR) → LinearRegression(positive) | 실행 완료 (이전 Voting 0.5446) |
 
 ## 6. 예전 실험 기록에 대해
 - `project01/experiments`, `project01/results`, `exp/*` 브랜치, `RESEARCH.md` 의 1번 실험은 **대부분 HOG 를 쓰고 셔플 없는 비교**라 위 규칙에 맞지 않는다. 참고용 기록일 뿐 제출 근거로 쓰지 않는다
